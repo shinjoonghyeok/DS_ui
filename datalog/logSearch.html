@@ -1,0 +1,1122 @@
+<link href="datalog/log.css" rel="stylesheet" type="text/css" />
+
+<div ng-controller="DatalogTransactionSearchController">
+  <div class="answer-modal answer-download" id="answer-download" aria-modal="true">
+    <answer-exportes-transaction></answer-exportes-transaction>
+  </div>
+
+  <div class="container-fluid">
+    <div class="row" style="padding: 0px 10px;">
+      <div class="col-8">
+        <!-- Cut Here -->
+
+        <!-- Cut Here -->
+
+        <div class="card bg-secondart mt-4 mb-3">
+          <div class="card-header answer-cursor-pointer font-weight-bold" ng-click="toggleSearchCondition('basic')">
+            검색조건 (검색 가능 일자 / {{ wormDate }} )
+          </div>
+          <div class="card-body px-5" ng-show="isSearchCondition">
+            <div class="row" id="searchForm">
+              <div class="form-group" style="width:170px;">
+                <label class="col-form-label col-form-label-sm" for="startDatePicker">거래 시작 일자</label>
+                <div class="input-group date" id="startDatePicker" data-target-input="nearest">
+                  <input type="text" class="form-control answer-form-input-text-small datetimepicker-input" data-target="#startDatePicker" data-toggle="datetimepicker" ng-model="searchStartDate" id="searchStartDate" />
+                  <div class="input-group-append answer-form-btn-small-append" data-target="#startDatePicker" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group answer-mr5" style="width:170px;">
+                <label class="col-form-label col-form-label-sm" for="endDatePicker">거래 종료 일자</label>
+                <div class="input-group date" id="endDatePicker" data-target-input="nearest">
+                  <input type="text" class="form-control answer-form-input-text-small datetimepicker-input" data-target="#endDatePicker" data-toggle="datetimepicker" ng-model="searchEndDate" id="searchEndDate" />
+                  <div class="input-group-append answer-form-btn-small-append" data-target="#endDatePicker" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+                </div>
+              </div>
+    
+              <div class="form-group answer-mr5">
+                <label class="col-form-label col-form-label-sm" for="searchAccount">계좌번호/통신ID</label>
+                <input type="text" class="form-control answer-form-input-text-small answer-form-input-p80" ng-model="searchAccount" />
+              </div>
+    
+              <div class="form-group answer-mr5">
+                <label class="col-form-label col-form-label-sm" for="searchServiceId">서비스ID</label>
+    
+                <!-- <div class="input-group" data-target-input="nearest">
+                  <input type="text" class="form-control answer-form-input-text-small answer-form-input-p100" ng-click="findServiceIDDialog()" ng-model="searchServiceId"  />
+                  <div class="input-group-append answer-form-btn-small-append answer-cursor-pointer" ng-click="unSelectedIRS()">
+                    <div class="input-group-text"><i class="fa fa-trash"></i></div>
+                  </div>
+                </div> -->
+                <div class="input-group" data-target-input="nearest">
+                  <input type="text" class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="searchServiceId"  />
+                  <div class="input-group-append answer-form-btn-small-append answer-cursor-pointer" ng-click="findServiceIDDialog()">
+                    <div class="input-group-text"><i class="fa fa-search"></i></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group answer-mr5">
+                <label class="col-form-label col-form-label-sm" for="searchArea">업무영역</label>
+                <select class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="searchArea"  style="height:27px;">
+                  <option value="">-영역 선택-</option>
+                  <option ng-repeat="fieldItem in searchAreaArray" value="{{ fieldItem.key }}">{{ fieldItem.value }}</option>
+                </select>
+              </div>
+    
+              <div class="form-group answer-mr5">
+                <label class="col-form-label col-form-label-sm " for="searchCannelId">채널ID</label>
+                <select class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="searchCannelId"  style="height:27px;">
+                  <option value="">-채널 선택-</option>
+                  <option ng-repeat="fieldItem in searchCannelIdArray" value="{{ fieldItem.key }}">{{ fieldItem.value }}</option>
+                </select>
+              </div>
+    
+              <div class="form-group answer-mr5">
+                <label class="col-form-label col-form-label-sm" for="searchCategory">처리유형</label>
+                <select class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="searchCategory"  style="height:27px;">
+                  <option value="">-유형 선택-</option>
+                  <option ng-repeat="fieldItem in searchCategoryArray" value="{{ fieldItem.key }}">{{ fieldItem.value }}</option>
+                </select>
+              </div>
+    
+              <div class="form-group answer-mr5">
+                <label class="col-form-label col-form-label-sm" for="searchUserIp">사용자IP</label>
+                <input type="text" class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="searchUserIp" />
+              </div>
+    
+              <div class="form-group answer-mr5">
+                <label class="col-form-label col-form-label-sm" for="searchMiddleIp">경유IP</label>
+                <input type="text" class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="searchMiddleIp" />
+              </div>
+    
+              <!-- <div class="form-group answer-mr5">
+                <label class="col-form-label col-form-label-sm" for="searchServiceId">시간간격</label>
+                <div class="input-group" data-target-input="nearest">
+                  <select class="form-control answer-form-input-text-small answer-form-input-p50" ng-model="searchDurationType" style="height:27px;">
+                    <option value="eq">같음</option>
+                    <option value="qt">초과</option>
+                    <option value="lt">미만</option>
+                  </select>
+                  
+                  <div class="input-group-append answer-form-btn-small-append">
+                    <input type="number" class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="searchDurationValue"  />
+                  </div>
+                </div>
+              </div> -->
+    
+              
+              <div class="form-group answer-mr5" style="display: block;clear: both; margin-left:15px">
+                <div class="row answer-ml4 answer-mr10" ng-repeat="(i, formItem) in logSearchForm track by $index">
+                  <div class="form-group ">
+                    <label ng-show="$index==0" class="col-form-label col-form-label-sm" for="searchField">추가검색조건</label>
+    
+                    <div class="input-group" data-target-input="nearest">
+                      <select class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="searchField[i]"  style="height:27px;">
+                        <option value="">-필드 선택-</option>
+                        <option ng-repeat="fieldItem in defineSearchList" value="{{ fieldItem.key }}">{{ fieldItem.value }}</option>
+                      </select>
+                      <input type="text" class="form-control form-control-sm answer-input-w80" ng-model="searchField[i]" ng-show="searchFieldArray.length == 0" />
+                      
+                      <div class="input-group-append answer-form-btn-small-append">
+                        <input type="text" class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="searchValue[i]" />
+                      </div>
+                    </div>
+                    
+                  </div>
+    
+                  <div class="form-group answer-mr5">
+                    <label ng-show="$index==0" class="col-form-label col-form-label-sm">&nbsp;</label>
+                    <div style="margin-top:-3px;margin-left:2px;"><i class="fa fa-close" style="cursor:pointer" ng-click="logSearchDel($index)"></i></div>
+                    <div style="margin-top:-2px;margin-left:2px;"><i class="fa fa-plus" style="cursor:pointer" ng-click="logSearchAdd()"></i></div>
+                  </div>
+                  </div>
+              </div>
+
+
+              <div class="form-group answer-mr5">
+                <label class="col-form-label col-form-label-sm" for="searchMiddleIp">필드 선택</label>
+                <select class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="selectedField" ng-change="selectFieldList()" style="height:27px;">
+                  <option ng-repeat="val in defineFieldInfoList track by $index" value="{{$index}}" ng-if="!val.flag">{{val.name}}</option>
+                </select>
+              </div>
+
+              <div class="form-group answer-mr5">
+                <label class="col-form-label col-form-label-sm answer-cursor-pointer" for="searchMiddleIp" ng-click="selectedFieldControl()">
+                  선택 필드 <i class="fa fa-angle-up ml-2" ng-if="showSelectFieldHeight"></i> <i class="fa fa-angle-down ml-2" ng-if="!showSelectFieldHeight"></i>
+                </label>
+                <div style="width:550px; border: 1px solid #ccc; padding: 5px; overflow:auto" ng-class="showSelectFieldHeight ? 'fixed-height27' : ''" >
+                  <span class="badge badge-success mx-2 answer-cursor-pointer" ng-repeat="val in defineFieldInfoList track by $index" ng-if="val.flag" ng-click="unselectFieldList($index)">
+                    {{val.name}}
+                  </span>
+                </div>
+              </div>
+    
+              <!-- <div class="form-group answer-ml5">
+                <label class="col-form-label col-form-label-sm" for="searchTarget">대상</label>
+                <select class="form-control answer-form-input-text-small answer-form-input-w50" id="searchTarget" ng-model="tableTransaction">
+                  <option value="daishinParse">-- 개발--</option>
+                  <option value="localtest_ds">-- SAMPLE--</option>
+                </select>
+              </div> -->
+    
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-4">
+        <div class="row" style="float:right;margin-right:25px;">
+          <div class="form-group answer-mr5">
+            <div class="row" style="margin-top: 25px;">
+              <!-- <button class="btn btn-primary answer-form-btn-small" ng-click="searchTotalLog('basic')" ng-show="btnFlag=='ready'" style="margin-left:5px;">
+                <i class="fa fa-search" aria-hidden="true"></i> 검색
+              </button>
+              <button class="btn btn-danger answer-form-btn-small" ng-click="searchStop()" ng-show="btnFlag=='searching'" style="margin-left:5px;">
+                <i class="fa fa-search" aria-hidden="true"></i> 중지
+              </button>
+
+              <button class="btn btn-warning answer-form-btn-small" ng-click="searchTotalLog('fulltext')" ng-show="btnFlag=='ready'" style="margin-left:5px;">
+                <i class="fa fa-bolt" aria-hidden="true"></i> 검색
+              </button>
+              <button class="btn btn-danger answer-form-btn-small" ng-click="searchStop()" ng-show="btnFlag=='searching'" style="margin-left:5px;">
+                <i class="fa fa-bolt" aria-hidden="true"></i> 중지
+              </button>
+
+              <button class="btn btn-outline-danger answer-form-btn-small" ng-click="searchErrorLog()" ng-show="btnErrFlag=='ready' && logSearchTotalCount > 0" style="margin-left:5px;">
+                <i class="fa fa-exclamation" aria-hidden="true"></i> GUID 재검색
+              </button>
+              <button class="btn btn-danger answer-form-btn-small" ng-click="searchErrorStop()" ng-show="btnErrFlag=='searching'" style="margin-left:5px;">
+                <i class="fa fa-exclamation" aria-hidden="true"></i> GUID 재검색 중지
+              </button> -->
+
+              <!-- <div class="form-group answer-mr5">
+                <select class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="tableTransaction">
+                  <option value="daishinParse">daishinParse</option>
+                  <option value="daishinParse_enc">daishinParse_enc</option>
+                </select>
+              </div> -->
+
+              <button class="btn btn-primary answer-form-btn-small" ng-click="searchTotalLog('fulltext')" ng-show="btnFlag=='ready'" style="margin-left:5px;">
+                <i class="fa fa-search" aria-hidden="true"></i> 검색
+              </button>
+              <button class="btn btn-danger answer-form-btn-small" ng-click="searchStop()" ng-show="btnFlag=='searching'" style="margin-left:5px;">
+                <i class="fa fa-spin fa-spinner" aria-hidden="true"></i> 중지
+              </button>
+
+              <button class="btn btn-warning answer-form-btn-small" ng-click="searchErrorLog()" ng-show="btnErrFlag=='ready' && logSearchTotalCount > 0" style="margin-left:5px;">
+                <i class="fa fa-bolt" aria-hidden="true"></i> GUID 재검색
+              </button>
+              <button class="btn btn-danger answer-form-btn-small" ng-click="searchErrorStop()" ng-show="btnErrFlag=='searching'" style="margin-left:5px;">
+                <i class="fa fa-spin fa-spinner" aria-hidden="true"></i> GUID 재검색 중지
+              </button>
+
+              <button class="btn btn-danger answer-form-btn-small" ng-click="searchConditionInit()" style="margin-left:10px;">
+                <i class="fa fa-refresh" aria-hidden="true"></i> 검색초기화
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" ng-show="logSearchTotalCount > 0" style="padding: 0px 10px;">
+      <div class="col-8">
+        <div class="card bg-secondart mt-4 mb-3">
+          <div class="card-header answer-cursor-pointer font-weight-bold" ng-click="toggleSearchCondition('research')">
+            재검색
+          </div>
+          <div class="card-body px-5" ng-show="isReSearchCondition">
+            <div class="row" id="reSearchForm">
+              <div class="form-group answer-mr5">
+                <label class="col-form-label col-form-label-sm" for="searchServiceId">시간간격</label>
+                <div class="input-group" data-target-input="nearest">
+                  <select class="form-control answer-form-input-text-small answer-form-input-p50" ng-model="reSearchDurationType" style="height:27px;">
+                    <option value="eq">같음</option>
+                    <option value="qt">초과</option>
+                    <option value="lt">미만</option>
+                  </select>
+                  
+                  <div class="input-group-append answer-form-btn-small-append">
+                    <input type="number" class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="reSearchDurationValue"  />
+                  </div>
+                </div>
+              </div>
+    
+              <div class="form-group answer-mr5">
+                <label class="col-form-label col-form-label-sm" for="searchServiceId">추가검색조건</label>
+                <div class="input-group" data-target-input="nearest">
+                  <select class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="reSearchTargetField"  style="height:27px;" ng-change="reSearchTargetValue=''"> 
+                    <option value="">-필드 선택-</option>
+                    <option ng-repeat="fieldItem in defineReSearchList" value="{{ fieldItem.key }}">{{ fieldItem.value }}</option>
+                  </select>
+                  
+                  <div class="input-group-append answer-form-btn-small-append">
+                    <input type="text" class="form-control answer-form-input-text-small answer-form-input-p100" ng-model="reSearchTargetValue" ng-show="reSearchTargetField!='업무영역'" />
+                    <select class="form-control answer-form-input-text-small answer-form-input-p120" ng-model="reSearchTargetValue"  style="height:27px;" ng-show="reSearchTargetField=='업무영역'">
+                      <option ng-repeat="fieldItem in searchAreaArray" value="{{ fieldItem.key }}">{{ fieldItem.value }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+    
+              <div class="form-group answer-mr5">
+                <button class="btn btn-warning answer-form-btn-small" ng-click="reSearchAction()" style="margin-left:10px;margin-top:25px;">
+                  <i class="fa fa-search" aria-hidden="true"></i> 재검색 {{ reSearchInfo.length }}
+                </button>
+
+                <!-- <button class="btn btn-danger answer-form-btn-small" ng-click="reSearchReset()" style="margin-left:10px;margin-top:25px;" ng-if="reSearchInfo.length > 0">
+                  <i class="fa fa-search" aria-hidden="true"></i> 재검색 초기화
+                </button> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-4">
+      </div>
+    </div>
+
+    
+    <div class="row">
+      <div class="col-6">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" ng-click="showQueryResult('basic')" ng-class="showSearchInfo=='basic' ? 'active' : ''" data-toggle="tab">
+                  기본조회
+                </a>
+            </li>
+            <li class="nav-item" ng-repeat="(i, reItem) in reSearchInfo track by $index">
+              <a class="nav-link" ng-click="showQueryResult(i)" ng-class="showSearchInfo==i ? 'active' : ''" data-toggle="tab">
+                재검색 {{ i + 1 }} 
+                <span ng-click="deleteResearchTab(i)"><i class="fa fa-times px-2"></i></span>
+              </a>
+            </li>
+
+            <li class="nav-item" ng-if="isErrorSearch">
+              <a class="nav-link" ng-click="showQueryResult('error')" ng-class="showSearchInfo=='error' ? 'active answer-error-active' : ''" data-toggle="tab">GUID 재검색</a>
+            </li>
+        </ul>
+      </div>
+      <div class="col-6 text-right pr-5 font-weight-bold">
+        <span ng-show="userSearchLimit == 0">검색 제한 : 무제한</span>
+        <span ng-show="userSearchLimit != 0">검색 제한 : {{ userSearchLimit | chkNumber }} 건</span>
+      </div>
+    </div>
+
+    
+    <div class="row" ng-show="showSearchInfo=='basic'">
+      <div class="col-12">
+        <div class="card-body">
+          <div class="row" style="padding: 0px 20px;">
+            <div class="col-4">
+              <div class="row">
+                {{logSearchTotalCount | number}} 건이 검색 되었습니다. [ {{ processTime }} ]
+              </div>
+            </div>
+
+            <div class="col-8">
+              <div class="row" style="float: right">
+                <button class="btn btn-outline-primary answer-form-btn-small answer-page-first" ng-click="logSearchPageChanged(1)">처음</button>
+                <div class="pagination">
+                  <a href="#" ng-click="logSearchJumpPrev()"><i class="fa fa-angle-double-left"></i></a>
+                  <a href="#" ng-click="logSearchPagePrev()"><i class="fa fa-angle-left"></i></a>
+
+                  <a href="#" ng-repeat="number in logSearchPaginationArray" ng-class="logSearchCurrentPage==number ? 'active' : ''" ng-click="logSearchPageChanged(number)">{{number}}</a>
+
+                  <a href="#" ng-click="logSearchPageNext()"><i class="fa fa-angle-right"></i></a>
+                  <a href="#" ng-click="logSearchJumpNext()"><i class="fa fa-angle-double-right"></i></a>
+                </div>
+                <button class="btn btn-outline-primary answer-form-btn-small answer-page-last" ng-click="logSearchPageChanged(logSearchPaginationCount)">마지막 <span>({{logSearchPaginationCount | number}} 쪽)</span></button>
+
+                <input type="number" min="1" max="{{logSearchPaginationCount}}" class="form-control answer-form-input-text-small answer-form-input-p50 answer-mr5 answer-ml5" ng-class="pageJumpNumber > logSearchPaginationCount ? 'answer_event_str_error' : ''"
+                  ng-model="logSearchJumpNumber" placeholder="1">
+                <button class="btn btn-primary btn-sm" ng-click="logSearchPageChanged(logSearchJumpNumber)">이동</button>
+
+                <button class="btn btn-success answer-form-btn-small" ng-click="logSearchDownload()" style="margin-left:10px;">
+                  <i class="fa fa-download" aria-hidden="true"></i> 다운로드
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row card-content" id="logSearchPanel">
+          <div class="col-md-12">
+            <div class="card card-main card-search answer-ml5" style="padding: 0px">
+              <div class="table_container table-fix-head" id="mainTable">
+                <table class="table table-condensed table-hover" style="width:100%" rz-table rz-mode="resizeMode" rz-save="false" id="logList">
+                  <thead class="answer-table-header">
+                    <tr class="table-primary">
+                      <!-- <th class="text-left" ng-repeat="val in defineFieldList track by $index" style="min-width:{{val.minWidth}}px;width:{{val.width}}px;">
+                        <div class="rz-handle"></div>
+                        {{val.value}}
+                      </th> -->
+                      <th class="text-left" style="min-width:50px;width:50px;">#</th>
+
+                      <!-- <th class="text-left" ng-repeat="val in defineFieldInfoList" id="val" rz-col="val" style="min-width:{{val.minWidth}};width:{{val.width}};">
+                        {{ val.name }}
+                      </th> -->
+
+                      <th class="text-left"  style="min-width:70px;width:80px;" ng-show="defineFieldInfoList[0].flag">처리유형</th>
+                      <th class="text-left"  style="min-width:80px;width:120px;" ng-show="defineFieldInfoList[1].flag">업무영역</th>
+                      <th class="text-left"  style="min-width:80px;width:100px;" ng-show="defineFieldInfoList[2].flag">호스트이름</th>
+                      <th class="text-left"  style="min-width:80px;width:180px;" ng-show="defineFieldInfoList[3].flag">Client Time</th>
+                      <th class="text-left"  style="min-width:80px;width:180px;" ng-show="defineFieldInfoList[4].flag">로그발생시각</th>
+                      <th class="text-left"  style="min-width:80px;width:120px;" ng-show="defineFieldInfoList[5].flag">시간간격</th>
+                      <th class="text-left"  style="min-width:80px;width:200px;" ng-show="defineFieldInfoList[6].flag">서비스식별자</th>
+                      <th class="text-left"  style="min-width:80px;width:200px;" ng-show="defineFieldInfoList[7].flag">서비스식별자(한글)</th>
+                      <th class="text-left"  style="min-width:80px;width:120px;" ng-show="defineFieldInfoList[8].flag">계좌번호/통신ID</th>
+                      <th class="text-left"  style="min-width:80px;width:120px;" ng-show="defineFieldInfoList[9].flag">MachineID</th>
+                      <th class="text-left"  style="min-width:90px;width:160px;" ng-show="defineFieldInfoList[10].flag">사용자IP</th>
+                      <th class="text-left"  style="min-width:80px;width:80px;" ng-show="defineFieldInfoList[11].flag">맥주소</th>
+                      <th class="text-left"  style="min-width:80px;width:100px;" ng-show="defineFieldInfoList[12].flag">화면번호</th>
+                      <th class="text-left"  style="min-width:80px;width:100px;" ng-show="defineFieldInfoList[13].flag">고유식별번호</th>
+                      <th class="text-left"  style="min-width:80px;width:100px;" ng-show="defineFieldInfoList[14].flag">부서코드</th>
+                      <th class="text-left"  style="min-width:80px;width:100px;" ng-show="defineFieldInfoList[15].flag">조작자사번</th>
+                      <th class="text-left"  style="min-width:80px;width:100px;" ng-show="defineFieldInfoList[16].flag">메시지코드</th>
+                      <th class="text-left"  style="min-width:80px;width:150px;" ng-show="defineFieldInfoList[17].flag">메지지영역</th>
+                    </tr>
+                  </thead>
+                  <tbody class="answer-table-body">
+                    <tr ng-show="logSearchResult.length == 0">
+                      <td colspan="17" style="text-align:center;">검색 된 로그데이터가 없습니다.</td>
+                    </tr>
+                    <tr ng-repeat="item in logSearchResult track by $index">
+                      <!-- --<td class="text-left" ng-repeat="val in logSearchFields track by $index" ng-right-click="getFieldInfo(item, val)" menu-items="subMenuList">-->
+                      <!-- <td class="text-left" ng-repeat="val in logSearchFields track by $index" ng-dbclick="adminTransaction(item)" data-toggle="modal" data-target="#adminTransaction"> -->
+
+                      <!-- <td class="text-left" ng-repeat="val in defineFieldList track by $index" ng-dblclick="adminTransaction(item)">
+                        <span ng-show="val.key == '#'">{{ ((logSearchCurrentPage - 1) * logSearchPageSize) + ($parent.$index+1) }}</span>
+                        {{item[val.key]}}
+                      </td> -->
+
+                      <td class="text-left" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')" ng-class="{'answer-row-selected': ($index == selectedRow && logSearchCurrentPage == selectedPage)}">{{ ((logSearchCurrentPage - 1) * logSearchPageSize) + ($index+1) }}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[0].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['처리유형']}}</td>
+
+                      <!-- <td class="text-left" ng-show="item['업무영역']=='HTS' && defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">HTS/MTS</td>
+                      <td class="text-left" ng-show="item['업무영역']=='COR' && defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')" >CORE</td>
+                      <td class="text-left" ng-show="item['업무영역']!='HTS' && item['업무영역']!='COR' && defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['업무영역']}}</td> -->
+
+                      <!-- <td class="text-left" ng-show="defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">
+                        <div ng-switch="item['업무영역']">
+                          <span ng-switch-when="COR">CORE</span>
+                          <span ng-switch-when="HTS">접속BP</span>
+                          <span ng-switch-when="BP">접속BP</span>
+                          <span ng-switch-when="ETCBP">접속BP</span>
+                          <span ng-switch-when="WTS">접속BP</span>
+                          <span ng-switch-default>{{ item['업무영역'] }}</span>
+                        </div>
+                      </td> -->
+
+                      <td class="text-left" ng-show="defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['업무영역']}}</td>
+
+                      <td class="text-left" ng-show="defineFieldInfoList[2].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['호스트이름']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[3].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['Client_Time']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[4].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['로그발생시각']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[5].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['시간간격']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[6].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['서비스식별자']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[7].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['서비스식별자(한글)']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[8].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['계좌번호']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[9].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['CMID']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[10].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['사용자IP']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[11].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['맥주소']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[12].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['화면번호']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[13].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['고유식별번호']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[14].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['접속자부서']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[15].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['조작자사번']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[16].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['메시지코드']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[17].flag" ng-dblclick="adminTransaction(item, $index, logSearchCurrentPage, 'basic')">{{item['메시지영역']}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+    <div class="row" ng-show="showSearchInfo=='error'">
+      <div class="col-12">
+        <div class="card-body">
+          <div class="row" style="padding: 0px 20px;">
+            <div class="col-4">
+              <div class="row">
+                {{errorSearchTotalCount | number}} 건이 검색 되었습니다.
+              </div>
+            </div>
+
+            <div class="col-8">
+              <div class="row" style="float: right">
+                <button class="btn btn-outline-primary answer-form-btn-small answer-page-first" ng-click="errorSearchPageChanged(1)">처음</button>
+                <div class="pagination">
+                  <a href="#" ng-click="errorSearchJumpPrev()"><i class="fa fa-angle-double-left"></i></a>
+                  <a href="#" ng-click="errorSearchPagePrev()"><i class="fa fa-angle-left"></i></a>
+
+                  <a href="#" ng-repeat="number in errorSearchPaginationArray" ng-class="errorSearchCurrentPage==number ? 'active' : ''" ng-click="errorSearchPageChanged(number)">{{number}}</a>
+
+                  <a href="#" ng-click="errorSearchPageNext()"><i class="fa fa-angle-right"></i></a>
+                  <a href="#" ng-click="errorSearchJumpNext()"><i class="fa fa-angle-double-right"></i></a>
+                </div>
+                <button class="btn btn-outline-primary answer-form-btn-small answer-page-last" ng-click="errorSearchPageChanged(errorSearchPaginationCount)">마지막 <span>({{errorSearchPaginationCount | number}} 쪽)</span></button>
+
+                <input type="number" min="1" max="{{errorSearchPaginationCount}}" class="form-control answer-form-input-text-small answer-form-input-p50 answer-mr5 answer-ml5" ng-class="pageJumpNumber > errorSearchPaginationCount ? 'answer_event_str_error' : ''"
+                  ng-model="errorSearchJumpNumber" placeholder="1">
+                <button class="btn btn-primary btn-sm" ng-click="errorSearchPageChanged(errorSearchJumpNumber)">이동</button>
+
+                <button class="btn btn-success answer-form-btn-small" ng-click="errorSearchDownload()" style="margin-left:10px;">
+                  <i class="fa fa-download" aria-hidden="true"></i> 다운로드
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row card-content" id="errorSearchPanel">
+          <div class="col-md-12">
+            <div class="card card-main card-search-error answer-ml5" style="padding: 0px">
+              <div class="table_container table-fix-head" id="mainTable">
+                <table class="table table-condensed table-hover" style="width:100%" rz-table="" rz-mode="resizeMode" id="logList">
+                  <thead class="answer-table-header">
+                    <tr class="table-primary">
+                      <!-- <th class="text-left" ng-repeat="val in defineFieldList track by $index" style="min-width:{{val.minWidth}}px;width:{{val.width}}px;">
+                        <div class="rz-handle"></div>
+                        {{val.value}}
+                      </th> -->
+                      <th class="text-left"  style="min-width:50px;width:50px;">#</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[0].flag" style="min-width:70px;width:80px;">처리유형</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[1].flag" style="min-width:80px;width:120px;">업무영역</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[2].flag" style="min-width:80px;width:100px;">호스트이름</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[3].flag" style="min-width:80px;width:180px;">Client Time</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[4].flag" style="min-width:80px;width:180px;">로그발생시각</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[5].flag" style="min-width:80px;width:120px;">시간간격</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[6].flag" style="min-width:80px;width:200px;">서비스식별자</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[7].flag" style="min-width:80px;width:200px;">서비스식별자(한글)</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[8].flag" style="min-width:80px;width:120px;">계좌번호/통신ID</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[9].flag" style="min-width:80px;width:120px;">MachineID</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[10].flag" style="min-width:90px;width:160px;">사용자IP</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[11].flag" style="min-width:80px;width:80px;">맥주소</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[12].flag" style="min-width:80px;width:100px;">화면번호</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[13].flag" style="min-width:80px;width:100px;">고유식별번호</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[14].flag" style="min-width:80px;width:100px;">부서코드</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[15].flag" style="min-width:80px;width:100px;">조작자사번</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[16].flag" style="min-width:80px;width:100px;">메시지코드</th>
+                      <th class="text-left" ng-show="defineFieldInfoList[17].flag" style="min-width:80px;width:150px;">메지지영역</th>
+                      
+                    </tr>
+                  </thead>
+                  <tbody class="answer-table-body">
+                    <tr ng-show="errorSearchResult.length == 0">
+                      <td colspan="17" style="text-align:center;">검색 된 로그데이터가 없습니다.</td>
+                    </tr>
+                    <tr ng-repeat="item in errorSearchResult track by $index">
+                      <!-- --<td class="text-left" ng-repeat="val in errorSearchFields track by $index" ng-right-click="getFieldInfo(item, val)" menu-items="subMenuList">-->
+                      <!-- <td class="text-left" ng-repeat="val in errorSearchFields track by $index" ng-dbclick="adminTransaction(item)" data-toggle="modal" data-target="#adminTransaction"> -->
+
+                      <!-- <td class="text-left" ng-repeat="val in defineFieldList track by $index" ng-dblclick="adminTransaction(item)">
+                        <span ng-show="val.key == '#'">{{ ((errorSearchCurrentPage - 1) * errorSearchPageSize) + ($parent.$index+1) }}</span>
+                        {{item[val.key]}}
+                      </td> -->
+
+                      <td class="text-left" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')" ng-class="{'answer-row-selected': ($index == selectedRow && errorSearchCurrentPage == selectedPage)}">{{ ((errorSearchCurrentPage - 1) * errorSearchPageSize) + ($index+1) }}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[0].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['처리유형']}}</td>
+
+                      <!-- <td class="text-left" ng-show="item['업무영역']=='HTS' && defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">HTS/MTS</td>
+                      <td class="text-left" ng-show="item['업무영역']=='COR' && defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">CORE</td>
+                      <td class="text-left" ng-show="item['업무영역']!='HTS' && item['업무영역']!='COR' && defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['업무영역']}}</td> -->
+
+                      <!-- <td class="text-left" ng-show="defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">
+                        <div ng-switch="item['업무영역']">
+                          <span ng-switch-when="COR">CORE</span>
+                          <span ng-switch-when="HTS">접속BP</span>
+                          <span ng-switch-when="BP">접속BP</span>
+                          <span ng-switch-when="ETCBP">접속BP</span>
+                          <span ng-switch-when="WTS">접속BP</span>
+                          <span ng-switch-default>{{ item['업무영역'] }}</span>
+                        </div>
+                      </td> -->
+
+                      <td class="text-left" ng-show="defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['업무영역']}}</td>
+
+                      <td class="text-left" ng-show="defineFieldInfoList[2].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['호스트이름']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[3].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['Client_Time']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[4].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['로그발생시각']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[5].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['시간간격']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[6].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['서비스식별자']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[7].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['서비스식별자(한글)']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[8].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['계좌번호']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[9].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['CMID']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[10].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['사용자IP']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[11].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['맥주소']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[12].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['화면번호']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[13].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['고유식별번호']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[14].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['접속자부서']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[15].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['조작자사번']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[16].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['메시지코드']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[17].flag" ng-dblclick="adminTransaction(item, $index, errorSearchCurrentPage, 'basic')">{{item['메시지영역']}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="row" ng-show="showSearchInfo!='basic' && showSearchInfo!='error'">
+      <div class="col-12">
+        <div class="card-body">
+          <div class="row" style="padding: 0px 20px;">
+            <div class="col-4">
+              <div class="row">
+                {{reSearchTotalCount[showSearchInfo] | number}} 건이 검색 되었습니다. [ {{reSearchInfo[showSearchInfo].field}} = {{reSearchInfo[showSearchInfo].value}} ]
+              </div>
+            </div>
+
+            <div class="col-8">
+              <div class="row" style="float: right">
+                <button class="btn btn-outline-primary answer-form-btn-small answer-page-first" ng-click="reSearchPageChanged(1,showSearchInfo)">처음</button>
+                <div class="pagination">
+                  <a href="#" ng-click="reSearchJumpPrev(showSearchInfo)"><i class="fa fa-angle-double-left"></i></a>
+                  <a href="#" ng-click="reSearchPagePrev(showSearchInfo)"><i class="fa fa-angle-left"></i></a>
+
+                  <a href="#" ng-repeat="number in reSearchPaginationArray[showSearchInfo]" ng-class="reSearchCurrentPage[showSearchInfo]==number ? 'active' : ''" ng-click="reSearchPageChanged(number,showSearchInfo)">{{number}}</a>
+
+                  <a href="#" ng-click="reSearchPageNext(showSearchInfo)"><i class="fa fa-angle-right"></i></a>
+                  <a href="#" ng-click="reSearchJumpNext(showSearchInfo)"><i class="fa fa-angle-double-right"></i></a>
+                </div>
+                <button class="btn btn-outline-primary answer-form-btn-small answer-page-last" ng-click="reSearchPageChanged(reSearchPaginationCount,showSearchInfo)">마지막 <span>({{reSearchPaginationCount[showSearchInfo] | number}} 쪽)</span></button>
+
+                <input type="number" min="1" max="{{reSearchPaginationCount[showSearchInfo]}}" class="form-control answer-form-input-text-small answer-form-input-p50 answer-mr5 answer-ml5" ng-class="pageJumpNumber > reSearchPaginationCount ? 'answer_event_str_error' : ''"
+                  ng-model="reSearchJumpNumber[showSearchInfo]" placeholder="1">
+                <button class="btn btn-primary btn-sm" ng-click="reSearchPageChanged(reSearchJumpNumber,showSearchInfo)">이동</button>
+
+                <button class="btn btn-success answer-form-btn-small" ng-click="reLogSearchDownload(showSearchInfo)" style="margin-left:10px;">
+                  <i class="fa fa-download" aria-hidden="true"></i> 다운로드
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row card-content" id="logSearchPanel">
+          <div class="col-md-12">
+            <div class="card card-main card-research-{{showSearchInfo}}" style="padding: 0px">
+              <div class="table_container table-fix-head" id="mainTable">
+                <table class="table table-condensed table-hover" style="width:100%" rz-table="" rz-mode="resizeMode" id="logList">
+                  <thead class="answer-table-header">
+                    <tr class="table-primary">
+                      <!-- <th class="text-left" ng-repeat="val in reSearchFields[showSearchInfo] track by $index" style="min-width:80px;width:{{tdWidth}}px;">
+                        {{val.key}}
+                      </th> -->
+
+                      <!-- <th class="text-left" ng-repeat="val in defineFieldList track by $index" style="min-width:{{val.minWidth}}px;width:{{val.width}}px;">
+                        {{val.value}}
+                      </th> -->
+                      <th class="text-left"  style="min-width:50px;width:50px;">#</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[0].flag" style="min-width:70px;width:80px;">처리유형</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[1].flag" style="min-width:80px;width:120px;">업무영역</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[2].flag" style="min-width:80px;width:100px;">호스트이름</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[3].flag" style="min-width:80px;width:180px;">Client Time</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[4].flag" style="min-width:80px;width:180px;">로그발생시각</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[5].flag" style="min-width:80px;width:120px;">시간간격</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[6].flag" style="min-width:80px;width:200px;">서비스식별자</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[7].flag" style="min-width:80px;width:200px;">서비스식별자(한글)</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[8].flag" style="min-width:80px;width:120px;">계좌번호/통신ID</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[9].flag" style="min-width:80px;width:120px;">MachineID</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[10].flag" style="min-width:90px;width:160px;">사용자IP</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[11].flag" style="min-width:80px;width:80px;">맥주소</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[12].flag" style="min-width:80px;width:100px;">화면번호</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[13].flag" style="min-width:80px;width:100px;">고유식별번호</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[14].flag" style="min-width:80px;width:100px;">접속자부서</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[15].flag" style="min-width:80px;width:100px;">조작자사번</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[16].flag" style="min-width:80px;width:100px;">메시지코드</th>
+                      <th class="text-left"  ng-show="defineFieldInfoList[17].flag" style="min-width:80px;width:150px;">메지지영역</th>
+                      
+                    </tr>
+                  </thead>
+                  <tbody class="answer-table-body">
+                    <tr ng-show="reSearchFields.length == 0">
+                      <td colspan="17" style="text-align:center;">검색 된 로그데이터가 없습니다.</td>
+                    </tr>
+                    <tr ng-repeat="item in reSearchInfo[showSearchInfo].result track by $index">
+                      <!-- --<td class="text-left" ng-repeat="val in logSearchFields track by $index" ng-right-click="getFieldInfo(item, val)" menu-items="subMenuList">-->
+                      <!-- <td class="text-left" ng-repeat="val in reSearchFields[showSearchInfo] track by $index">
+                        {{item[val.key]  | chkNumber}}
+                      </td> -->
+
+                      <!-- <td class="text-left" ng-repeat="val in defineFieldList track by $index" ng-dblclick="adminTransaction(item)">
+                        <span ng-show="val.key == '#'">{{ ((reSearchCurrentPage[showSearchInfo] - 1) * reSearchPageSize[showSearchInfo]) + ($parent.$index+1) }}</span>
+                        {{item[val.key]}}
+                      </td> -->
+                      <td class="text-left" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)" ng-class="{'answer-row-selected': ($index == reSelectedRow[showSearchInfo] && reSearchCurrentPage[showSearchInfo] == reSelectedPage[showSearchInfo]) }">{{ ((reSearchCurrentPage[showSearchInfo] - 1) * reSearchPageSize[showSearchInfo]) + ($index+1) }}</td>
+
+                      <td class="text-left" ng-show="defineFieldInfoList[0].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['처리유형']}}</td>
+
+                      <!-- <td class="text-left" ng-show="item['업무영역']=='HTS' && defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">HTS/MTS</td>
+                      <td class="text-left" ng-show="item['업무영역']=='COR' && defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)" >CORE</td>
+                      <td class="text-left" ng-show="item['업무영역']!='HTS' && item['업무영역']!='COR' && defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['업무영역']}}</td> -->
+
+                      <!-- <td class="text-left" ng-show="defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">
+                        <div ng-switch="item['업무영역']">
+                          <span ng-switch-when="COR">CORE</span>
+                          <span ng-switch-when="HTS">접속BP</span>
+                          <span ng-switch-when="BP">접속BP</span>
+                          <span ng-switch-when="ETCBP">접속BP</span>
+                          <span ng-switch-when="WTS">접속BP</span>
+                          <span ng-switch-default>{{ item['업무영역'] }}</span>
+                        </div>  
+                      </td> -->
+
+                      <td class="text-left" ng-show="defineFieldInfoList[1].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['업무영역']}}</td>
+
+                      <td class="text-left" ng-show="defineFieldInfoList[2].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['호스트이름']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[3].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['Client_Time']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[4].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['로그발생시각']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[5].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['시간간격']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[6].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['서비스식별자']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[7].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['서비스식별자(한글)']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[8].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['계좌번호']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[9].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['CMID']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[10].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['사용자IP']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[11].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['맥주소']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[12].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['화면번호']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[13].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['고유식별번호']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[14].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['접속자부서']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[15].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['조작자사번']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[16].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['메시지코드']}}</td>
+                      <td class="text-left" ng-show="defineFieldInfoList[17].flag" ng-dblclick="adminTransaction(item, $index, reSearchCurrentPage[showSearchInfo], showSearchInfo)">{{item['메시지영역']}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+  </div>
+
+
+  <!-- Modal Area -->
+
+  <!-- Find Service ID -->
+  <div class="answer-modal" id="findServiceID">
+    <div class="answer-modal-dialog answer-modal-w800" role="document">
+      <div class="answer-modal-content">
+        <div class="answer-modal-header">
+          <h5 class="answer-modal-title">서비스 ID 찾기</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="answer-modal-body">
+          <div class="row answer-modal-irs-content">
+            <div class="col-12 col-lg-12 col-xl-12">
+              <div class="form-group text-ds-title" style="padding:10px;">
+                <strong>검색</strong>
+                <table class="table table-bordered table-hover">
+                  <tbody class="answer-table-body">
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>서비스 아이디</strong></span></th>
+                      <td>
+                        <input type="text" class="form-control answer-form-input-text-small answer-form-input-w90" ng-model="findServiceID" id="searchServiceIDForm" />
+                      </td>
+                      <td><button type="button" class="btn btn-warning" ng-click="findServiceIDAction('id')">검색</button></td>
+
+                      <th scope="row"><span class="text-ds"><strong>서비스 이름</strong></span></th>
+                      <td>
+                        <input type="text" class="form-control answer-form-input-text-small answer-form-input-w90" ng-model="findServiceName" id="searchServiceNameForm" />
+                      </td>
+                      <td><button type="button" class="btn btn-warning" ng-click="findServiceIDAction('name')">검색</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <table class="table table-bordered table-hover">
+                  <thead class="answer-table-header">
+                    <tr class="table-info">
+                      <th style="width:35%;">서비스아이디</th>
+                      <th style="width:55%;">서비스이름</th>
+                      <th style="width:10%;"></th>
+                    </tr>
+                  </thead>
+                  <tbody class="answer-table-body" id="irsSearchPanel">
+                    <tr ng-repeat="irsItem in findServiceList track by $index">
+                      <td>{{ irsItem.serviceID }}</td>
+                      <td>{{ irsItem.serviceName }}</td>
+                      <td><button type="button" class="btn btn-success" ng-click="selectedIRS(irsItem.serviceID)">확인</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="answer-modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Find Service ID -->
+
+  <!-- Log Detail Admin -->
+
+  <div class="answer-modal" id="adminTransaction">
+    <div class="answer-modal-dialog answer-modal-w1200" role="document">
+      <div class="answer-modal-content">
+        <div class="answer-modal-header">
+          <h5 class="answer-modal-title">거래로그 상세화면</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="closeTransaction()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="answer-modal-body">
+          <div class="row">
+            <div class="col-12 col-lg-12 col-xl-12">
+              <ul class="nav nav-tabs">
+                <li class="nav-item">
+                  <a class="nav-link" ng-click="showEventInfo('header')" ng-class="showInfo=='header' ? 'active' : ''" data-toggle="tab">HeaderData</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" ng-click="showEventInfo('user')" ng-class="showInfo=='user' ? 'active' : ''" data-toggle="tab">UserData</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="row answer-modal-ds-content-main" ng-show="showInfo=='header'">
+            <div class="col-12 col-lg-12 col-xl-12">
+              <div class="form-group text-ds-title" style="padding:10px;">
+                <strong>서비스/TR영역</strong>
+                <table class="table table-bordered table-hover" id="table-service">
+                  <thead class="answer-table-header">
+                    <tr class="table-dark">
+                      <th style="width:10%;">항목</th>
+                      <th style="width:40%;">Description</th>
+                      <th style="width:10%;">항목</th>
+                      <th style="width:40%;">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody class="answer-table-body">
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>총길이</strong></span></th>
+                      <td>{{totalLength}}</td>
+                      <th scope="row"><span class="text-ds"><strong>헤더 길이</strong></span></th>
+                      <td>{{headerLength}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>메시지 길이</strong></span></th>
+                      <td>{{messageLength}}</td>
+                      <th scope="row"><span class="text-ds"><strong>유저데이터 길이</strong></span></th>
+                      <td>{{userdataLength}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>처리유형</strong></span></th>
+                      <td>{{trTY}}</td>
+                      <th scope="row"><span class="text-ds"><strong>업무영역</strong></span></th>
+                      <td>
+                        <!-- <div ng-switch="jobName">
+                          <span ng-switch-when="COR">CORE</span>
+                          <span ng-switch-when="HTS">접속BP</span>
+                          <span ng-switch-when="BP">접속BP</span>
+                          <span ng-switch-when="ETCBP">접속BP</span>
+                          <span ng-switch-when="WTS">접속BP</span>
+                          <span ng-switch-default>{{jobName}}</span>
+                        </div> -->
+                        {{jobName}}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>호스트이름</strong></span></th>
+                      <td>{{hostName}}</td>
+                      <th scope="row"><span class="text-ds"><strong>고유식별번호</strong></span></th>
+                      <td>{{GUID}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>Client Time</strong></span></th>
+                      <td>{{CTIME}}</td>
+                      <th scope="row"><span class="text-ds"><strong>로그발생시각</strong></span></th>
+                      <td>{{SORT_TIME}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>서비스식별자</strong></span></th>
+                      <td>{{serviceID}}</td>
+                      <th scope="row"><span class="text-ds"><strong>서비스식별자(한글)</strong></span></th>
+                      <td>{{serviceName}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>화면번호</strong></span></th>
+                      <td>{{screenNum}}</td>
+                      <th scope="row"><span class="text-ds"><strong>메시지 버전</strong></span></th>
+                      <td>{{messageVersion}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+
+                <strong>시스템정보영역</strong>
+                <table class="table table-bordered table-hover" id="table-system">
+                  <thead class="answer-table-header">
+                    <tr class="table-dark">
+                      <th style="width:10%;">항목</th>
+                      <th style="width:40%;">Description</th>
+                      <th style="width:10%;">항목</th>
+                      <th style="width:40%;">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody class="answer-table-body">
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>채널ID</strong></span></th>
+                      <td>{{channelId}}</td>
+                      <th scope="row"><span class="text-ds"><strong>Machine ID</strong></span></th>
+                      <td>{{cmId}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>UTime</strong></span></th>
+                      <td>{{uTime}}</td>
+                      <th scope="row"><span class="text-ds"><strong>RqID</strong></span></th>
+                      <td>{{rqId}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>RqHnd</strong></span></th>
+                      <td>{{rqHnd}}</td>
+                      <th scope="row"><span class="text-ds"><strong>경유서버 IP</strong></span></th>
+                      <td>{{mmId}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>IP</strong></span></th>
+                      <td>{{ip}}</td>
+                      <th scope="row"><span class="text-ds"><strong>PMID</strong></span></th>
+                      <td>{{pmId}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>MAC</strong></span></th>
+                      <td>{{mac}}</td>
+                      <th scope="row"><span class="text-ds"><strong>Reserved</strong></span></th>
+                      <td>{{reserved}}</td>
+                    </tr>
+
+                  </tbody>
+                </table>
+
+                <strong>사용자 정보</strong>
+                <table class="table table-bordered table-hover" id="table-user">
+                  <thead class="answer-table-header">
+                    <tr class="table-dark">
+                      <th style="width:10%;">항목</th>
+                      <th style="width:40%;">Description</th>
+                      <th style="width:10%;">항목</th>
+                      <th style="width:40%;">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody class="answer-table-body">
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>고객등급</strong></span></th>
+                      <td>{{user_level}}</td>
+                      <th scope="row"><span class="text-ds"><strong>단말회사코드</strong></span></th>
+                      <td>{{user_company_code}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>단말지점코드</strong></span></th>
+                      <td>{{user_branch_code}}</td>
+                      <th scope="row"><span class="text-ds"><strong>단말영업소코드</strong></span></th>
+                      <td>{{user_biz_code}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>부서코드</strong></span></th>
+                      <td>{{user_dept}}</td>
+                      <th scope="row"><span class="text-ds"><strong>조작자계열사</strong></span></th>
+                      <td>{{user_oper_company}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>조작자사번</strong></span></th>
+                      <td>{{user_oper_empid}}</td>
+                      <th scope="row"><span class="text-ds"><strong>인증정보</strong></span></th>
+                      <td>{{ssoauth}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>고객정보구분</strong></span></th>
+                      <td>{{user_info_gubun}}</td>
+                      <th scope="row"><span class="text-ds"><strong>로컬정보</strong></span></th>
+                      <td>{{locale}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>스크린ID</strong></span></th>
+                      <td>{{screenID}}</td>
+                      <th scope="row"><span class="text-ds"><strong>UIComID</strong></span></th>
+                      <td>{{uicomID}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+                <strong>사용자 상태</strong>
+                <table class="table table-bordered table-hover" id="table-user-status">
+                  <thead class="answer-table-header">
+                    <tr class="table-dark">
+                      <th style="width:10%;">긴급</th>
+                      <th style="width:10%;">연속</th>
+                      <th style="width:10%;">Err</th>
+                      <th style="width:10%;">수신</th>
+                      <th style="width:10%;">암호</th>
+                      <th style="width:10%;">전자서명</th>
+                      <th style="width:10%;">메시지</th>
+                      <th style="width:10%;">압축</th>
+                      <th style="width:10%;">little/big</th>
+                      <th style="width:10%;">사용자</th>
+                      <th style="width:10%;">Hash</th>
+                      <th style="width:10%;">패스워드</th>
+                    </tr>
+                  </thead>
+                  <tbody class="answer-table-body">
+                    <tr>
+                      <td>{{userFlag3[0]}}</td>
+                      <td>{{userFlag3[1]}}</td>
+                      <td>{{userFlag3[2]}}</td>
+                      <td>{{userFlag3[3]}}</td>
+                      <td>{{userFlag3[4]}}</td>
+                      <td>{{userFlag3[5]}}</td>
+                      <td>{{userFlag3[6]}}</td>
+                      <td>{{userFlag3[7]}}</td>
+                      <td>{{userFlag3[8]}}</td>
+                      <td>{{userFlag3[9]}}</td>
+                      <td>{{userFlag3[10]}}</td>
+                      <td>{{userFlag3[11]}}</td>
+                    </tr>
+                  </tbody>             
+                </table>
+                
+                <strong>메시지</strong>
+                <table class="table table-bordered table-hover" id="table-message">
+                  <thead class="answer-table-header">
+                    <tr class="table-dark">
+                      <th style="width:10%;">항목</th>
+                      <th style="width:40%;">Description</th>
+                      <th style="width:10%;">항목</th>
+                      <th style="width:40%;">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody class="answer-table-body">
+                    <tr>
+                      <th scope="row"><span class="text-ds"><strong>메시지코드</strong></span></th>
+                      <td>{{message_code}}</td>
+                      <th scope="row"><span class="text-ds"><strong>메시지영역</strong></span></th>
+                      <td>{{message_body}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                
+                <div class="row">
+                  <div class="col-6">
+                    <strong class="text-ds-title">Time Cnt</strong>
+                    <table class="table table-bordered table-hover" id="table-time">
+                      <thead class="answer-table-header">
+                        <tr class="table-dark">
+                          <th style="width:10%;">Block</th>
+                          <th style="width:40%;">Time data</th>
+                        </tr>
+                      </thead>
+                      <tbody class="answer-table-body">
+                        <tr ng-repeat="tItem in timeData">
+                          <th scope="row"><span class="text-ds"><strong>{{tItem.block}}</strong></span></th>
+                          <td>{{tItem.tData}}</td>
+                        </tr>
+                      </tbody>             
+                    </table>
+                  </div>
+                                    
+                  <div class="col-6">
+                    <strong class="text-ds-title">E2E 암호화</strong>
+                    <table class="table table-bordered table-hover" id="table-e2e">
+                      <thead class="answer-table-header">
+                        <tr class="table-dark">
+                          <th style="width:10%;">Offset</th>
+                          <th style="width:40%;">Length</th>
+                        </tr>
+                      </thead>
+                      <tbody class="answer-table-body">
+                        <tr ng-repeat="eItem in e2eData">
+                          <th scope="row"><span class="text-ds"><strong>{{eItem.offset}}</strong></span></th>
+                          <td>{{eItem.length}}</td>
+                        </tr>
+                      </tbody>             
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row answer-modal-ds-content-sub" ng-show="showInfo=='user'">
+            <div class="col-12 col-lg-12 col-xl-12">
+              <div style="padding: 5px;"> 
+                <div class="custom-control custom-switch" style="margin-top:5px;">
+                  <input type="checkbox" class="custom-control-input" id="dataKO" ng-model="showTitleKo">
+                  <label class="custom-control-label" for="dataKO">한글로 보기</label>
+                </div>
+
+                <strong ng-show="!showTitleKo">{{serviceID}}</strong>
+                <strong ng-show="showTitleKo">{{serviceName}}</strong>
+              </div>
+              
+              <div class="form-group text-ds-title answer-modal-ds-content-detail ans-container" style="padding:0px;">
+                <table class="table table-bordered table-hover ans-fixed-table" style="width:100%" ng-show="parseResult=='SUCCESS'" id="table-user-data">
+                  <thead class="answer-table-header">
+                    <tr class="table-dark">
+                      <th class="text-center font-weight-bold" scope="col">#</th>
+                      <th ng-show="!showTitleKo" class="text-left" scope="col" ng-repeat="enItem in userDataFieldEn track by $index">{{ enItem }}</th>
+                      <th ng-show="showTitleKo" class="text-left" scope="col" ng-repeat="koItem in userDataFieldKo track by $index">{{ koItem }}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="answer-table-body">
+                    <tr ng-repeat="listItem in userDataValue track by $index">
+                      <th class="font-weight-bold text-center">{{ $index + 1 }}</th>
+                      <td class="text-left" ng-repeat="valItem in listItem track by $index">
+                        {{ valItem }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="answer-modal-footer">
+          <button type="button" class="btn btn-success" ng-click="detailSearchDownload()">상세내역 다운로드</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="closeTransaction()">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Log Detail Admin -->
+
+
+
+</div>
